@@ -14,50 +14,47 @@ The model follows a decoder-only Transformer architecture.
 
 Given an input sequence:
 
-<img src="./assets/svg0.png" />
+![eq](assets/pngs/svg0.png)
 
 Token and positional embeddings:
 
-<img src="assets/svg1.png" />
+![eq](assets/pngs/svg1.png)
 
 Combined representation:
 
-<img src="assets/svg2.png" />
-
+![eq](assets/pngs/svg2.png)
 ---
 
 ## Transformer Block
 
 Each block performs:
 
-<img src="assets/svg3.png" />
+![eq](assets/pngs/svg3.png)
 
-<img src="assets/svg4.png" />
+![eq](assets/pngs/svg4.png)
 
-<img src="assets/svg5.png" />
+![eq](assets/pngs/svg5.png)
 
-<img src="assets/svg6.png" />
-
+![eq](assets/pngs/svg6.png)
 ---
 
 ## Multi-Head Self-Attention
 
 Query, Key, Value:
 
-<img src="assets/svg7.png" />
+![eq](assets/pngs/svg7.png)
 
 Scaled attention:
 
-<img src="assets/svg8.png" />
+![eq](assets/pngs/svg8.png)
 
 Causal masking:
 
-<img src="assets/svg9.png" />
+![eq](assets/pngs/svg9.png)
 
 Softmax:
 
-<img src="assets/svg10.png" />
-
+![eq](assets/pngs/svg10.png)
 Output:
 
 <img src="assets/svg11.png" />
