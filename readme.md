@@ -14,7 +14,7 @@ The model follows a decoder-only Transformer architecture.
 
 Given an input sequence:
 
-<img src="assets/svg0.svg" />
+<img src="./assets/svg0.svg" />
 
 Token and positional embeddings:
 
