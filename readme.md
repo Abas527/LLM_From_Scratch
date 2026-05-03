@@ -14,15 +14,15 @@ The model follows a decoder-only Transformer architecture.
 
 Given an input sequence:
 
-<img src="https://latex.codecogs.com/svg.image?x=[x_1,x_2,\dots,x_T]" />
+<img src="assets/svg0.svg" />
 
 Token and positional embeddings:
 
-<img src="https://latex.codecogs.com/svg.image?E_{tok}\in\mathbb{R}^{V\times&space;d},\quad&space;E_{pos}\in\mathbb{R}^{L\times&space;d}" />
+<img src="assets/svg1.svg" />
 
 Combined representation:
 
-<img src="https://latex.codecogs.com/svg.image?\mathbf{h}_0=E_{tok}[x]+E_{pos}[:T]" />
+<img src="assets/svg2.svg" />
 
 ---
 
@@ -30,13 +30,13 @@ Combined representation:
 
 Each block performs:
 
-<img src="https://latex.codecogs.com/svg.image?\hat{\mathbf{h}}=\text{LayerNorm}(\mathbf{h})" />
+<img src="assets/svg3.svg" />
 
-<img src="https://latex.codecogs.com/svg.image?\mathbf{h}=\mathbf{h}+\text{MHA}(\hat{\mathbf{h}})" />
+<img src="assets/svg4.svg" />
 
-<img src="https://latex.codecogs.com/svg.image?\hat{\mathbf{h}}=\text{LayerNorm}(\mathbf{h})" />
+<img src="assets/svg5.svg" />
 
-<img src="https://latex.codecogs.com/svg.image?\mathbf{h}=\mathbf{h}+\text{FFN}(\hat{\mathbf{h}})" />
+<img src="assets/svg6.svg" />
 
 ---
 
@@ -44,41 +44,41 @@ Each block performs:
 
 Query, Key, Value:
 
-<img src="https://latex.codecogs.com/svg.image?\mathbf{Q}=\mathbf{h}W^Q,\quad\mathbf{K}=\mathbf{h}W^K,\quad\mathbf{V}=\mathbf{h}W^V" />
+<img src="assets/svg7.svg" />
 
 Scaled attention:
 
-<img src="https://latex.codecogs.com/svg.image?A=\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_h}}" />
+<img src="assets/svg8.svg" />
 
 Causal masking:
 
-<img src="https://latex.codecogs.com/svg.image?A_{ij}=-\infty\quad\text{if }i<j" />
+<img src="assets/svg9.svg" />
 
 Softmax:
 
-<img src="https://latex.codecogs.com/svg.image?A=\text{softmax}(A)" />
+<img src="assets/svg10.svg" />
 
 Output:
 
-<img src="https://latex.codecogs.com/svg.image?\mathbf{a}_h=A\mathbf{V}" />
+<img src="assets/svg11.svg" />
 
 Concatenation:
 
-<img src="https://latex.codecogs.com/svg.image?\mathbf{a}=\text{concat}(\mathbf{a}_1,\dots,\mathbf{a}_H)W^O" />
+<img src="assets/svg12.svg" />
 
 ---
 
 ## Feed-Forward Network
 
-<img src="https://latex.codecogs.com/svg.image?\text{FFN}(\mathbf{x})=\max(0,\mathbf{x}W_1+b_1)W_2+b_2" />
+<img src="assets/svg13.svg" />
 
 ---
 
 ## Output Layer
 
-<img src="https://latex.codecogs.com/svg.image?\mathbf{h}_N=\text{LayerNorm}(\mathbf{h})" />
+<img src="assets/svg14.svg" />
 
-<img src="https://latex.codecogs.com/svg.image?\mathbf{l}=\mathbf{h}_NW_{head}+b_{head}" />
+<img src="assets/svg15.svg" />
 
 ---
 
@@ -86,11 +86,11 @@ Concatenation:
 
 ### Objective
 
-<img src="https://latex.codecogs.com/svg.image?\mathcal{L}=-\sum_{t=1}^{T}\log&space;p(x_t|x_{<t})" />
+<img src="assets/svg16.svg" />
 
 Where:
 
-<img src="https://latex.codecogs.com/svg.image?p(x_t|x_{<t})=\text{softmax}(\mathbf{l}_t)" />
+<img src="assets/svg17.svg" />
 
 ---
 
@@ -120,12 +120,13 @@ Byte-Level BPE:
 4. Sample random batches  
 5. Train using next-token prediction  
 
+---
 
 ## Text Generation
 
 Autoregressive decoding:
 
-<img src="https://latex.codecogs.com/svg.image?x_{t+1}\sim&space;P(x|x_{\leq&space;t})" />
+<img src="assets/svg18.svg" />
 
 Supports:
 - Temperature sampling  
