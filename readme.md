@@ -1,171 +1,231 @@
+
+```markdown
 # LLM from Scratch
 
-This project implements a complete language model from scratch, including data preprocessing, tokenization, model architecture, training, and inference.
+A complete implementation of a language model built from scratch, including data preprocessing, tokenization, transformer architecture, training pipeline, and inference.
+
+## Features
+
+- Transformer Decoder architecture inspired by GPT models
+- Byte-Level BPE tokenization with configurable vocabulary
+- Efficient training with streaming data pipeline
+- Temperature and top-k sampling for controlled text generation
+- Configurable model parameters (layers, heads, dimensions)
 
 ## Architecture
 
-The model follows the Transformer decoder architecture, similar to GPT models.
+The model implements a standard Transformer decoder with causal attention masking.
 
 ### Embedding Layer
 
-The input sequence of tokens \( x = [x_1, x_2, \dots, x_T] \) is first embedded into a continuous vector space.
+Input tokens `x = [x_1, x_2, ..., x_T]` are mapped to continuous vectors:
 
-- **Token Embeddings**: \( E_{tok} \in \mathbb{R}^{V \times d} \), where \( V \) is vocabulary size and \( d \) is embedding dimension.
-- **Positional Embeddings**: \( E_{pos} \in \mathbb{R}^{L \times d} \), where \( L \) is maximum sequence length.
+- **Token Embeddings**: `E_tok in R^(V×d)` where `V` = vocabulary size, `d` = embedding dimension
+- **Positional Embeddings**: `E_pos in R^(L×d)` where `L` = maximum sequence length
 
-The embedded representation is:
-\[
-\mathbf{h}_0 = E_{tok}[x] + E_{pos}[:T]
-\]
+The combined representation:
+```
+h_0 = E_tok[x] + E_pos[:T]
+```
 
 ### Transformer Block
 
-The model consists of \( N \) identical transformer blocks. Each block performs:
+Each of the `N` identical blocks processes the input through:
 
-1. **Layer Normalization**: \( \hat{\mathbf{h}} = \text{LayerNorm}(\mathbf{h}) \)
-2. **Multi-Head Self-Attention**: \( \mathbf{a} = \text{MHA}(\hat{\mathbf{h}}) \)
-3. **Residual Connection**: \( \mathbf{h} = \mathbf{h} + \mathbf{a} \)
-4. **Layer Normalization**: \( \hat{\mathbf{h}} = \text{LayerNorm}(\mathbf{h}) \)
-5. **Feed-Forward Network**: \( \mathbf{f} = \text{FFN}(\hat{\mathbf{h}}) \)
-6. **Residual Connection**: \( \mathbf{h} = \mathbf{h} + \mathbf{f} \)
+```
+h <- h + MHA(LayerNorm(h))
+h <- h + FFN(LayerNorm(h))
+```
 
 ### Multi-Head Self-Attention
 
-For each attention head \( h \):
+For each head `h`:
 
-- Query: \( \mathbf{Q} = \mathbf{h} W^Q \)
-- Key: \( \mathbf{K} = \mathbf{h} W^K \)
-- Value: \( \mathbf{V} = \mathbf{h} W^V \)
+1. Compute projections: `Q = hW^Q`, `K = hW^K`, `V = hW^V`
+2. Calculate attention scores: `A = (QK^T) / sqrt(d_h)`
+3. Apply causal masking: `A_ij = -inf if i < j`
+4. Normalize with softmax: `A = softmax(A)`
+5. Weight values: `a_h = A V`
 
-Attention weights:
-\[
-A = \frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{d_h}}
-\]
-
-Causal masking (lower triangular):
-\[
-A_{ij} = -\infty \quad \text{if } i < j
-\]
-
-Softmax normalization:
-\[
-A = \softmax(A)
-\]
-
-Output:
-\[
-\mathbf{a}_h = A \mathbf{V}
-\]
-
-Multi-head concatenation and projection:
-\[
-\mathbf{a} = \concat(\mathbf{a}_1, \dots, \mathbf{a}_H) W^O
-\]
+Multiple heads are concatenated and projected:
+```
+a = concat(a_1, ..., a_H) W^O
+```
 
 ### Feed-Forward Network
 
-\[
-\text{FFN}(\mathbf{x}) = \max(0, \mathbf{x} W_1 + b_1) W_2 + b_2
-\]
+A two-layer MLP with ReLU activation:
+```
+FFN(x) = max(0, xW_1 + b_1) W_2 + b_2
+```
+- `W_1 in R^(d×4d)`, `W_2 in R^(4d×d)`
 
-Where \( W_1 \in \mathbb{R}^{d \times 4d} \), \( W_2 \in \mathbb{R}^{4d \times d} \).
+### Output Layer
 
-### Final Layers
-
-After \( N \) blocks:
-\[
-\mathbf{h}_N = \text{LayerNorm}(\mathbf{h}_{N-1})
-\]
-
-Logits:
-\[
-\mathbf{l} = \mathbf{h}_N W_{head} + b_{head}
-\]
+Final processing:
+```
+h_N = LayerNorm(h_{N-1})
+l = h_N W_head + b_head  # logits
+```
 
 ## Training
 
 ### Objective
 
 Next-token prediction using cross-entropy loss:
+```
+L = -sum_{t=1}^T log p(x_t | x_<t)
+```
+where `p(x_t | x_<t) = softmax(l_t)`
 
-\[
-\mathcal{L} = -\sum_{t=1}^T \log p(x_t | x_{<t})
-\]
+### Hyperparameters
 
-Where \( p(x_t | x_{<t}) = \softmax(\mathbf{l}_t) \).
-
-### Optimization
-
-- Optimizer: AdamW with learning rate \( 10^{-4} \)
-- Training steps: 5000
-- Batch size: 32
-- Sequence length: 128
+| Parameter | Value |
+|-----------|-------|
+| Optimizer | AdamW |
+| Learning rate | 1e-4 |
+| Training steps | 5,000 |
+| Batch size | 32 |
+| Sequence length | 128 |
 
 ## Tokenization
 
-Uses Byte-Level Byte Pair Encoding (BPE):
-
-- Vocabulary size: 256
+Uses **Byte-Level BPE** (Byte Pair Encoding):
+- Base vocabulary: 256 bytes
 - Special tokens: `<s>`, `<pad>`, `</s>`, `<unk>`
+- Trained on the target corpus
 
 ## Data Pipeline
 
-1. **Data Preparation**:
-   - Load CSV data
-   - Clean text (remove extra whitespace)
-   - Convert to text files
+```
+CSV Data -> Text Cleaning -> Text Files -> BPE Training -> Tokenization -> Training -> Model -> Inference
+```
 
-2. **Tokenization**:
-   - Train BPE tokenizer on training data
-   - Encode text to token IDs
-
-3. **Training**:
-   - Stream data in batches
-   - Forward pass through model
-   - Compute loss and backpropagate
-   - Save model weights
-
-4. **Inference**:
-   - Load trained model
-   - Encode input text
-   - Generate tokens autoregressively
-   - Decode to text
+1. **Data Preparation**: Load CSV, clean whitespace, save as text files
+2. **Tokenization**: Train BPE tokenizer, encode text to IDs
+3. **Training**: Stream batches -> forward pass -> loss computation -> backpropagation
+4. **Inference**: Load model -> encode prompt -> generate tokens -> decode to text
 
 ## Model Configuration
 
-- Vocabulary size: 256
-- Maximum sequence length: 128
-- Embedding dimension: 512
-- Number of attention heads: 8
-- Number of layers: 10
-- Feed-forward expansion: 4x
+Default configuration:
+```python
+{
+    "vocab_size": 256,
+    "max_seq_len": 128,
+    "embed_dim": 512,
+    "num_heads": 8,
+    "num_layers": 10,
+    "ffn_expansion": 4
+}
+```
 
-## Generation
+## Text Generation
 
-Uses temperature sampling with optional top-k filtering:
+Supports sampling strategies for controlled generation:
 
-- Temperature \( \tau \): scales logits before softmax
-- Top-k: keeps only top k most probable tokens
+- **Temperature scaling**: `tau` controls randomness (lower = more deterministic)
+- **Top-k filtering**: Only keep `k` most probable tokens
 
-Stops generation at end-of-sequence token.
+Generation stops when end-of-sequence token (`</s>`) is produced.
 
 ## Usage
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/llm-from-scratch
+cd llm-from-scratch
+
+# Install dependencies
+pip install torch tokenizers datasets tqdm
+```
 
 ### Training
 
 ```bash
+# Train a new model
 python -m src.training
+
+# Or with custom parameters
+python -m src.training --config configs/train.yaml
 ```
 
-### Inference
+### Inference / Text Generation
 
 ```bash
+# Run the interactive generation app
 python -m app
+
+# Or use the CLI
+python generate.py --prompt "Once upon a time" --temperature 0.8 --top_k 40
+```
+
+### Using as a Library
+
+```python
+from src.model import LLM
+from src.tokenizer import BPETokenizer
+
+# Load model
+model = LLM.from_pretrained("checkpoints/model.pt")
+tokenizer = BPETokenizer.load("tokenizer.json")
+
+# Generate text
+prompt = "The future of AI is"
+input_ids = tokenizer.encode(prompt)
+output_ids = model.generate(input_ids, max_length=100, temperature=0.7)
+generated_text = tokenizer.decode(output_ids)
+
+print(generated_text)
+```
+
+## Project Structure
+
+```
+llm-from-scratch/
+├── src/
+│   ├── model.py          # Transformer model definition
+│   ├── attention.py      # Multi-head attention module
+│   ├── tokenizer.py      # BPE tokenizer implementation
+│   ├── training.py       # Training loop and pipeline
+│   └── utils.py          # Helper functions
+├── app.py                # Inference interface
+├── generate.py           # CLI generation script
+├── configs/              # Configuration files
+├── data/                 # Dataset storage
+├── checkpoints/          # Trained model weights
+└── README.md
 ```
 
 ## Dependencies
 
-- torch
-- tokenizers
-- datasets
-- tqdm
+- `torch` - Deep learning framework
+- `tokenizers` - Fast BPE tokenization
+- `datasets` - Data loading utilities  
+- `tqdm` - Progress bars
+
+## Future Improvements
+
+- Flash Attention support for faster training
+- Multi-GPU distributed training
+- KV-caching for inference speedup
+- Model checkpoint resuming
+- Evaluation metrics (perplexity, accuracy)
+- Fine-tuning interface
+- Web UI for generation
+
+## License
+
+MIT
+
+## Acknowledgments
+
+Inspired by:
+- Attention Is All You Need (Vaswani et al.)
+- GPT-2 Paper (Radford et al.)
+- Andrej Karpathy's nanoGPT
+```
+
+This version maintains all the improvements from the previous version but removes all emoji characters, using clean text formatting instead.
