@@ -218,4 +218,3 @@ Inspired by:
 - Attention Is All You Need (Vaswani et al.)
 - GPT-2 Paper (Radford et al.)
 - Andrej Karpathy's nanoGPT
-```
