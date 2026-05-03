@@ -223,10 +223,6 @@ llm-from-scratch/
 - Fine-tuning interface
 - Web UI for generation
 
-## License
-
-MIT
-
 ## Acknowledgments
 
 Inspired by:
@@ -234,4 +230,3 @@ Inspired by:
 - GPT-2 Paper (Radford et al.)
 - Andrej Karpathy's nanoGPT
 ```
-
