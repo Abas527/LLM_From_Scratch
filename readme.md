@@ -12,70 +12,64 @@ The model follows a decoder-only Transformer architecture.
 
 ## Embedding Layer
 
-Given an input sequence:
-
-![eq](assets/svg0.png)
+Given an input sequence: x = [x1, x2, ..., xT]
 
 Token and positional embeddings:
-
-![eq](assets/svg1.png)
+- Token Embeddings: E_tok in R^(V x d), where V = vocabulary size, d = embedding dimension
+- Positional Embeddings: E_pos in R^(L x d), where L = maximum sequence length
 
 Combined representation:
+h0 = E_tok[x] + E_pos[:T]
 
-![eq](assets/svg2.png)
 ---
 
 ## Transformer Block
 
-Each block performs:
+Each block performs operations in the following order:
 
-![eq](assets/svg3.png)
+1. h_hat = LayerNorm(h)
+2. a = MHA(h_hat)
+3. h = h + a
+4. h_hat = LayerNorm(h)
+5. f = FFN(h_hat)
+6. h = h + f
 
-![eq](assets/svg4.png)
-
-![eq](assets/svg5.png)
-
-![eq](assets/svg6.png)
 ---
 
 ## Multi-Head Self-Attention
 
-Query, Key, Value:
+For each attention head:
 
-![eq](assets/svg7.png)
+Query: Q = h W^Q
+Key: K = h W^K
+Value: V = h W^V
 
-Scaled attention:
+Scaled attention scores: A = (Q K^T) / sqrt(d_h)
 
-![eq](assets/svg8.png)
+Causal masking: A_ij = -infinity if i < j
 
-Causal masking:
+Softmax normalization: A = softmax(A)
 
-![eq](assets/svg9.png)
+Output for one head: a_h = A V
 
-Softmax:
-
-![eq](assets/svg10.png)
-Output:
-
-<img src="assets/svg11.png" />
-
-Concatenation:
-
-<img src="assets/svg12.png" />
+Multi-head concatenation and projection: a = concat(a1, ..., a_H) W^O
 
 ---
 
 ## Feed-Forward Network
 
-<img src="assets/svg13.png" />
+FFN(x) = max(0, x W1 + b1) W2 + b2
+
+Where W1 in R^(d x 4d) and W2 in R^(4d x d)
 
 ---
 
 ## Output Layer
 
-<img src="assets/svg14.png" />
+After N transformer blocks:
+h_N = LayerNorm(h_{N-1})
 
-<img src="assets/svg15.png" />
+Logits: l = h_N W_head + b_head
 
 ---
 
@@ -83,53 +77,50 @@ Concatenation:
 
 ### Objective
 
-<img src="assets/svg16.png" />
+Next-token prediction using cross-entropy loss:
+L = - sum_{t=1 to T} log p(x_t | x_<t)
 
 Where:
-
-<img src="assets/svg17.png" />
+p(x_t | x_<t) = softmax(l_t)
 
 ---
 
 ## Optimization
 
-- Optimizer: AdamW  
-- Learning rate: 3e-4  
-- Batch size: 32  
-- Sequence length: 128  
+- Optimizer: AdamW
+- Learning rate: 3e-4
+- Batch size: 32
+- Sequence length: 128
 
 ---
 
 ## Tokenization
 
 Byte-Level BPE:
-
-- Vocabulary size: 256  
-- Special tokens: `<s>`, `</s>`, `<pad>`, `<unk>`  
+- Vocabulary size: 256
+- Special tokens: `<s>`, `</s>`, `<pad>`, `<unk>`
 
 ---
 
 ## Data Pipeline
 
-1. Load and clean text  
-2. Train tokenizer  
-3. Encode into token IDs  
-4. Sample random batches  
-5. Train using next-token prediction  
+1. Load and clean text
+2. Train tokenizer
+3. Encode into token IDs
+4. Sample random batches
+5. Train using next-token prediction
 
 ---
 
 ## Text Generation
 
-Autoregressive decoding:
-
-<img src="assets/svg18.png" />
+Autoregressive decoding: x_t ~ softmax(l_t / tau) where tau is temperature
 
 Supports:
-- Temperature sampling  
-- Top-k filtering  
-- Repetition penalty  
-- EOS stopping  
+- Temperature sampling
+- Top-k filtering
+- Repetition penalty
+- EOS stopping
 
 ---
 
