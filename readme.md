@@ -14,15 +14,15 @@ The model follows a decoder-only Transformer architecture.
 
 Given an input sequence:
 
-<img src="./assets/svg0.svg" />
+<img src="./assets/svg0.png" />
 
 Token and positional embeddings:
 
-<img src="assets/svg1.svg" />
+<img src="assets/svg1.png" />
 
 Combined representation:
 
-<img src="assets/svg2.svg" />
+<img src="assets/svg2.png" />
 
 ---
 
@@ -30,13 +30,13 @@ Combined representation:
 
 Each block performs:
 
-<img src="assets/svg3.svg" />
+<img src="assets/svg3.png" />
 
-<img src="assets/svg4.svg" />
+<img src="assets/svg4.png" />
 
-<img src="assets/svg5.svg" />
+<img src="assets/svg5.png" />
 
-<img src="assets/svg6.svg" />
+<img src="assets/svg6.png" />
 
 ---
 
@@ -44,41 +44,41 @@ Each block performs:
 
 Query, Key, Value:
 
-<img src="assets/svg7.svg" />
+<img src="assets/svg7.png" />
 
 Scaled attention:
 
-<img src="assets/svg8.svg" />
+<img src="assets/svg8.png" />
 
 Causal masking:
 
-<img src="assets/svg9.svg" />
+<img src="assets/svg9.png" />
 
 Softmax:
 
-<img src="assets/svg10.svg" />
+<img src="assets/svg10.png" />
 
 Output:
 
-<img src="assets/svg11.svg" />
+<img src="assets/svg11.png" />
 
 Concatenation:
 
-<img src="assets/svg12.svg" />
+<img src="assets/svg12.png" />
 
 ---
 
 ## Feed-Forward Network
 
-<img src="assets/svg13.svg" />
+<img src="assets/svg13.png" />
 
 ---
 
 ## Output Layer
 
-<img src="assets/svg14.svg" />
+<img src="assets/svg14.png" />
 
-<img src="assets/svg15.svg" />
+<img src="assets/svg15.png" />
 
 ---
 
@@ -86,11 +86,11 @@ Concatenation:
 
 ### Objective
 
-<img src="assets/svg16.svg" />
+<img src="assets/svg16.png" />
 
 Where:
 
-<img src="assets/svg17.svg" />
+<img src="assets/svg17.png" />
 
 ---
 
@@ -126,7 +126,7 @@ Byte-Level BPE:
 
 Autoregressive decoding:
 
-<img src="assets/svg18.svg" />
+<img src="assets/svg18.png" />
 
 Supports:
 - Temperature sampling  

@@ -1,11 +1,8 @@
 import os
 import requests
-import zipfile
 
-# Create folder
-os.makedirs("assets", exist_ok=True)
+os.makedirs("pngs", exist_ok=True)
 
-# LaTeX equations (in order)
 equations = [
     "x=[x_1,x_2,\\dots,x_T]",
     "E_{tok}\\in\\mathbb{R}^{V\\times d},\\quad E_{pos}\\in\\mathbb{R}^{L\\times d}",
@@ -28,15 +25,15 @@ equations = [
     "x_{t+1}\\sim P(x|x_{\\leq t})"
 ]
 
-base_url = "https://latex.codecogs.com/svg.image?"
+base_url = "https://latex.codecogs.com/png.image?"
 
-# Download SVGs
 for i, eq in enumerate(equations):
     url = base_url + eq
-    response = requests.get(url)
-    
-    file_path = f"assets/svg{i}.svg"
-    with open(file_path, "wb") as f:
-        f.write(response.content)
+    r = requests.get(url)
 
-print("SVGs downloaded.")
+    with open(f"assets/svg{i}.png", "wb") as f:
+        f.write(r.content)
+
+    print(f"Downloaded PNG {i}")
+
+print("All PNGs downloaded.")
