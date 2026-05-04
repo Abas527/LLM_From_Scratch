@@ -9,7 +9,7 @@ from .attention import LLM
 
 eos_token_id=encode_text("</s>")[0] 
 @torch.no_grad()
-def generate(model, idx, max_new_tokens, block_size, temperature=1.0, top_k=None):
+def generate(model, idx, max_new_tokens, block_size, temperature=0.5, top_k=None):
 
     model.eval()
 
